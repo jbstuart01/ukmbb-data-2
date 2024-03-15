@@ -4,10 +4,10 @@ from datetime import datetime
 import re
 import requests
 
-# fetch HTML data from the website
-def get_html(url):
-    response = requests.get(url)
-    return response.text
+# read data from HTML
+def read_html(html):
+    # create a beautifulsoup object
+    return BeautifulSoup(html, 'html.parser')
 
 # make the box score given soup
 def get_box_score(soup, uk_first):
@@ -32,32 +32,20 @@ def get_box_score(soup, uk_first):
 
             # append player statistics to the list
             all_player_stats.append(player_stats)
-    
-    # return a box score of the game with the headers and footers trimmed off
-    return all_player_stats[1:-2]
 
-# read data from HTML
-def read_html(html, csv_filename):
-    # create a beautifulsoup object
-    soup = BeautifulSoup(html, 'html.parser')
-    
-    # find the title of the webpage
-    # this tells us the date of the game and if Kentucky is first or second box score
-    title = soup.title.get_text()
+    # strip leading null entry and trailing information
+    all_player_stats = all_player_stats[1:-2]
 
-    # get the date of the game
-    date = get_date(title)
+    # use the null entry in between teams to separate the two teams in the list
+    separator_index = next((i for i, row in enumerate(all_player_stats) if not row), None)
 
-    # make the box score
-    get_box_score(soup, uk_first(title))
+    # split the data into separate teams
+    team1_data = all_player_stats[:separator_index]
+    team2_data = all_player_stats[separator_index + 1:]
+    # compile the box score based on whether or not UK was shown first
+    box_score = [team1_data, team2_data] if uk_first else [team2_data, team1_data]
 
-    data = []
-    paragraphs = soup.find_all('a')
-    for p in paragraphs[:-15]:
-        data.append(p.get_text())   
-       
-    # return the HTML data
-    return data
+    return box_score
 
 # given the webpage's title, figure out if Kentucky is listed first
 def uk_first(title):
@@ -69,33 +57,31 @@ def uk_first(title):
     elif " at " in title:
         teams = title.split(" at ")
         return teams[0] == "Kentucky"
-
-
-# clean up data from HTML
-def clean_data(data):
-    # this dictionary will hold the cleaned data
-    new_data = {}
-
-    # assign this game's date
-    new_data["date"] = get_date(data[1])
-    print(new_data["date"])
-
-# pull the date out of the title
-def get_date(title):
-    # extract the characters between the parentheses
+    
+# pull opponent and YYYY-MM-DD out of the title
+def get_game_info(title):
+    # Split the string based on delimiters ' at ', ' vs. ', and ' (' or ' )'
+    if ' at ' in title:
+        team1, team2 = title.split(' at ')
+    else:
+        team1, team2 = title.split(' vs. ')
+    
+    # trim the date off of team2
+    team2_nodate = team2.split(' (')[0]
+    
+    # build the date from the given data between parentheses
     date_match = re.search(r'\(([^)]+)\)', title)
-
-    # if it worked, do the following
     if date_match:
-        # make the data between the parentheses raw_date
         raw_date = date_match.group(1)
-        # format the date
         date_object = datetime.strptime(raw_date, "%B %d, %Y")
         formatted_date = date_object.strftime("%Y-%m-%d")
-    else:
-        formatted_date = "ERROR"
+    
+    # return the opponent and formatted date
+    return [team2_nodate if team1 == 'Kentucky' else team1, formatted_date]
 
-    return formatted_date
+# given a soup, return the title
+def get_title(soup):
+    return soup.title.get_text()
 
 # write data to CSV
 def write_csv(data, csv_filename):
@@ -105,19 +91,5 @@ def write_csv(data, csv_filename):
             writer.writerow([item])
 
 # URL of the website to scrape
-url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19891128Ohio.html'
-
-# filename of the CSV to create
-csv_filename = '19030206GeorgetownCollege.csv'
-
-# fetch HTML data
-html = get_html(url)
-
-# extract data and write to CSV
-html_data = read_html(html, csv_filename)
-
-# clean the data
-#clean_data(html_data)
-
-# write the data to a CSV
-#write_csv(html_data, csv_filename)
+url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19080110LexingtonYMCA.html'
+#url = 'http://www.bigbluehistory.net/bb/Statistics/Games/20240206Vanderbilt.html'
