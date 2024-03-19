@@ -4,17 +4,25 @@ from datetime import datetime
 import re
 import requests
 
-# read data from HTML
-def read_html(html):
-    # create a beautifulsoup object
-    return BeautifulSoup(html, 'html.parser')
+# read data from an HTML webpage
+def read_html(url):
+    # read data from the webpage
+    response = requests.get(url)
+
+    # create and return a beautifulsoup object
+    return BeautifulSoup(response.text, 'html.parser')
 
 # make the box score given soup
-def get_box_score(soup, uk_first):
+def get_box_score(soup, title):
     tables = soup.find_all('table')
 
-    # initialize a list of 17 empty elements to hold statistics
-    # 17 is the full amount of stats, so box scores from early seasons without certain statistics will still be same size
+    # get the title of the webpage
+    title = get_title(soup)
+
+    # get the title and game information of this webpage, to be used later
+    info = get_game_info(soup)
+
+    # initialize the box score
     all_player_stats = []
 
     # iterate through each table
@@ -28,7 +36,7 @@ def get_box_score(soup, uk_first):
             cells = rows[i].find_all('td')
 
             # extract text from each cell and remove whitespace
-            player_stats = [cell.get_text().strip() for cell in cells]
+            player_stats = [cell.get_text() for cell in cells]
 
             # append player statistics to the list
             all_player_stats.append(player_stats)
@@ -43,9 +51,26 @@ def get_box_score(soup, uk_first):
     team1_data = all_player_stats[:separator_index]
     team2_data = all_player_stats[separator_index + 1:]
     # compile the box score based on whether or not UK was shown first
-    box_score = [team1_data, team2_data] if uk_first else [team2_data, team1_data]
+    box_score = [team1_data, team2_data] if uk_first(title) else [team2_data, team1_data]
+
+    # add the game's date and opponent to each player
+    # for Kentucky, this value means opponent, for Opponents, this means what team they played for
+    # iterate through both teams
+    for team in box_score:
+        # iterate through all players in this team
+        for player in team:
+            player.insert(0, info[0])
+            player.insert(1, info[1])
+    
+    # remove any ' (*)' links from opponents
+    # this indicates that the player is "significant" but we don't care about that
+    box_score[1] = [[player[0].replace(' (*)', '')] + player[1:] for player in box_score[1]]
 
     return box_score
+
+# given a soup, get the URL of the next game
+def get_next_url(html_content):
+    pass
 
 # given the webpage's title, figure out if Kentucky is listed first
 def uk_first(title):
@@ -58,8 +83,11 @@ def uk_first(title):
         teams = title.split(" at ")
         return teams[0] == "Kentucky"
     
-# pull opponent and YYYY-MM-DD out of the title
-def get_game_info(title):
+# given a soup, pull opponent and YYYY-MM-DD out of the title
+def get_game_info(soup):
+    # get the title of this webpage
+    title = get_title(soup)
+
     # Split the string based on delimiters ' at ', ' vs. ', and ' (' or ' )'
     if ' at ' in title:
         team1, team2 = title.split(' at ')
@@ -77,11 +105,15 @@ def get_game_info(title):
         formatted_date = date_object.strftime("%Y-%m-%d")
     
     # return the opponent and formatted date
-    return [team2_nodate if team1 == 'Kentucky' else team1, formatted_date]
+    return [formatted_date, team2_nodate if team1 == 'Kentucky' else team1]
 
 # given a soup, return the title
 def get_title(soup):
-    return soup.title.get_text()
+    if soup is not None and soup.title is not None:
+        return soup.title.get_text()
+    else:
+        print("Error! Soup is None.")
+        return None
 
 # write data to CSV
 def write_csv(data, csv_filename):
@@ -91,5 +123,10 @@ def write_csv(data, csv_filename):
             writer.writerow([item])
 
 # URL of the website to scrape
-url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19080110LexingtonYMCA.html'
-#url = 'http://www.bigbluehistory.net/bb/Statistics/Games/20240206Vanderbilt.html'
+#url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19080110LexingtonYMCA.html'
+url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19891128Ohio.html'
+
+soup = read_html(url)
+title = get_title(soup)
+box_score = get_box_score(soup, title)
+print(box_score)
