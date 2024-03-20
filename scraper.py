@@ -59,8 +59,8 @@ def get_box_score(soup, title):
     for team in box_score:
         # iterate through all players in this team
         for player in team:
-            player.insert(0, info[0])
-            player.insert(1, info[1])
+            player.insert(1, info[0])
+            player.insert(2, info[1])
     
     # remove any ' (*)' links from opponents
     # this indicates that the player is "significant" but we don't care about that
@@ -114,19 +114,26 @@ def get_title(soup):
     else:
         print("Error! Soup is None.")
         return None
+    
+# find the URL of the next game
+def next_game(soup):
+    # find the last of all the tables if possible
+    last_table = soup.find_all('table')[-1]
 
-# write data to CSV
-def write_csv(data, csv_filename):
-    with open(csv_filename, 'w', newline = '', encoding = 'utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        for item in data:
-            writer.writerow([item])
+    # find all 'a' tags (links) within this table
+    links = last_table.find_all('a')
+
+    # extract the HREF attribute value from each 'a' tag
+    href_values = [link['href'] for link in links]
+
+    return href_values[-1]
 
 # URL of the website to scrape
 #url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19080110LexingtonYMCA.html'
-url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19891128Ohio.html'
+url = 'http://www.bigbluehistory.net/bb/Statistics/Games/20091113Morehead.html'
 
 soup = read_html(url)
 title = get_title(soup)
 box_score = get_box_score(soup, title)
 print(box_score)
+print(next_game(soup))
