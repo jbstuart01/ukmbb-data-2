@@ -65,30 +65,46 @@ def run_query(conn, cur, query):
     # return all the results
     return cur.fetchall()
 
+# add multiple games to the database
+def add_games(conn, cur):
+    # the game we start with
+    game = '20091113Morehead.html'
+    # iterate over however many consecutive games you want to add
+    for i in range(0, 38):
+        # build a soup out of this game's webpage
+        soup = scraper.read_html(f"http://www.bigbluehistory.net/bb/Statistics/Games/{game}")
+        
+        # get the title of this game
+        title = scraper.get_title(soup)
+        
+        # make the box score
+        box_score = scraper.get_box_score(soup, title)
+
+        # populate the database with this box score
+        populate_database(conn, cur, box_score)
+
+        print(f"Added: {game}")
+        
+        # get the next game
+        game = scraper.next_game(soup)
+
 # main function
 def main():
     # connect to the database
     conn = sqlite3.connect('ukgames.db')
     cur = conn.cursor()
 
-    # URL of the website to scrape
-    #url = 'http://www.bigbluehistory.net/bb/Statistics/Games/19080110LexingtonYMCA.html'
-    url = 'http://www.bigbluehistory.net/bb/Statistics/Games/20091113Morehead.html'
-
-    #soup = read_html(url)
-    #title = get_title(soup)
-    #box_score = get_box_score(soup, title)
-
-    #populate_database(conn, cur, box_score)
+    # add games to the database
+    #add_games(conn, cur)
+   
+    #query = "DELETE FROM OppPlayerStats;"
     
-    #query = "WITH CTE AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY Name) AS row_num FROM UKPlayerStats) DELETE FROM UKPlayerStats WHERE rowid IN (SELECT rowid FROM CTE WHERE row_num > 1);"
-    query = "SELECT Name, TRB FROM UKPlayerStats WHERE TRB > 1;"
-    print(run_query(conn, cur, query))
-    
-    
+    query = "SELECT Name, Team, PTS FROM OppPlayerStats WHERE PTS > 23 AND Name != 'Team' AND Name != 'Totals';"
+    print(run_query(conn, cur, query))    
     
     # commit and close the database
     conn.commit()
     conn.close()
+
 if __name__ == "__main__":
     main()

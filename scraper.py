@@ -95,7 +95,7 @@ def get_game_info(soup):
     team2_nodate = team2.split(' (')[0]
     
     # build the date from the given data between parentheses
-    date_match = re.search(r'\(([^)]+)\)', title)
+    date_match = re.search(r'\(([^)]{3,})\)', title)
     if date_match:
         raw_date = date_match.group(1)
         date_object = datetime.strptime(raw_date, "%B %d, %Y")
