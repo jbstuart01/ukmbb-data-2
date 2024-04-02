@@ -49,16 +49,68 @@ def populate_database(conn, cur, box_score):
                 PTS INT
                 )''')
     
+    # create a table to store UK's team statistics
+    cur.execute('''CREATE TABLE IF NOT EXISTS UKTeamStats (
+                Name TEXT,
+                Date TEXT,
+                Opponent TEXT,
+                Minutes INT,
+                FGM INT,
+                FGA INT,
+                TFGM INT,
+                TFGA INT,
+                FTM INT,
+                FTA INT,
+                ORB INT,
+                DRB INT,
+                TRB INT,
+                PF INT,
+                AST INT,
+                STL INT,
+                BLK INT,
+                TOV INT,
+                PTS INT
+                )''')
+    
+    # create a table to store UK's team statistics
+    cur.execute('''CREATE TABLE IF NOT EXISTS OppTeamStats (
+                Name TEXT,
+                Date TEXT,
+                Team TEXT,
+                Minutes INT,
+                FGM INT,
+                FGA INT,
+                TFGM INT,
+                TFGA INT,
+                FTM INT,
+                FTA INT,
+                ORB INT,
+                DRB INT,
+                TRB INT,
+                PF INT,
+                AST INT,
+                STL INT,
+                BLK INT,
+                TOV INT,
+                PTS INT
+                )''')
+    
     # iterate through each player, updating the correct table
     # iterate through Kentucky players
-    for player in box_score[0]:
+    for player in box_score["UKPlayerStats"]:
         cur.execute("INSERT INTO UKPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
     # iterate through opposing players
-    for player in box_score[1]:
+    for player in box_score["OppPlayerStats"]:
         cur.execute("INSERT INTO OppPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
+    
+    # add Kentucky's team stats
+    cur.execute("INSERT INTO UKTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["UKTeamStats"])
+    # add the opponent's team stats
+    cur.execute("INSERT INTO OppTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["OppTeamStats"])
 
 # perform queries to the database
 def run_query(conn, cur, query):
+    print(query)
     # execute the query
     cur.execute(query)
 
@@ -70,7 +122,7 @@ def add_games(conn, cur):
     # the game we start with
     game = '20091113Morehead.html'
     # iterate over however many consecutive games you want to add
-    for i in range(0, 38):
+    for i in range(0, 532):
         # build a soup out of this game's webpage
         soup = scraper.read_html(f"http://www.bigbluehistory.net/bb/Statistics/Games/{game}")
         
@@ -99,7 +151,7 @@ def main():
    
     #query = "DELETE FROM OppPlayerStats;"
     
-    query = "SELECT Name, Team, PTS FROM OppPlayerStats WHERE PTS > 23 AND Name != 'Team' AND Name != 'Totals';"
+    query = "SELECT Name, Opponent, PTS FROM UKPlayerStats WHERE PTS > 29;"
     print(run_query(conn, cur, query))    
     
     # commit and close the database

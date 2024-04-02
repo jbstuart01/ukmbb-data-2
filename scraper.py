@@ -67,7 +67,8 @@ def get_box_score(soup, title):
     # this indicates that the player is "significant" but we don't care about that
     box_score[1] = [[player[0].replace(' (*)', '')] + player[1:] for player in box_score[1]]
 
-    return box_score
+    # return the box score as a dictionary
+    return {"UKPlayerStats" : box_score[0][:-1] if box_score[0][-2][0] != "Team" else box_score[0][:-2], "OppPlayerStats" : box_score[1][:-1] if box_score[0][-2][0] != "Team" else box_score[0][:-2], "UKTeamStats" : box_score[0][-1], "OppTeamStats" : box_score[1][-1]}
 
 # given the webpage's title, figure out if Kentucky is listed first
 def uk_first(title):
