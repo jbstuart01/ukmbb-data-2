@@ -2,7 +2,7 @@ import scraper
 import sqlite3
 
 # populate a database with a box score
-def populate_database(conn, cur, box_score):
+def populate_database(cur, box_score):
     # create a table to store Kentucky players' statistics
     cur.execute('''CREATE TABLE IF NOT EXISTS UKPlayerStats (
                 Name TEXT,
@@ -109,7 +109,7 @@ def populate_database(conn, cur, box_score):
     cur.execute("INSERT INTO OppTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["OppTeamStats"])
 
 # perform queries to the database
-def run_query(conn, cur, query):
+def run_query(cur, query):
     print(query)
     # execute the query
     cur.execute(query)
@@ -118,7 +118,7 @@ def run_query(conn, cur, query):
     return cur.fetchall()
 
 # add multiple games to the database
-def add_games(conn, cur):
+def add_games(cur):
     # the game we start with
     game = '20091113Morehead.html'
     # iterate over however many consecutive games you want to add
@@ -133,7 +133,7 @@ def add_games(conn, cur):
         box_score = scraper.get_box_score(soup, title)
 
         # populate the database with this box score
-        populate_database(conn, cur, box_score)
+        populate_database(cur, box_score)
 
         print(f"Added: {game}")
         
@@ -147,10 +147,10 @@ def main():
     cur = conn.cursor()
 
     # add games to the database
-    #add_games(conn, cur)
+    #add_games(cur)
     
-    query = "SELECT Date, Name, PTS FROM OppPlayerStats WHERE PTS > 39;"
-    print(run_query(conn, cur, query))    
+    query = "DELETE * FROM OppPlayerStats WHERE Name = 'Team';"
+    print(run_query(cur, query))    
     
     # commit and close the database
     conn.commit()
