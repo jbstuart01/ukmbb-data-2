@@ -148,10 +148,8 @@ def main():
 
     # add games to the database
     #add_games(conn, cur)
-   
-    #query = "DELETE FROM OppPlayerStats;"
     
-    query = "SELECT Name, Opponent, PTS FROM UKPlayerStats WHERE PTS > 29;"
+    query = "SELECT Date, Name, PTS FROM OppPlayerStats WHERE PTS > 39;"
     print(run_query(conn, cur, query))    
     
     # commit and close the database
