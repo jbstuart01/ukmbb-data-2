@@ -110,7 +110,7 @@ def populate_database(cur, box_score):
 
 # perform queries to the database
 def run_query(cur, query):
-    print(query)
+    #print(query)
     # execute the query
     cur.execute(query)
 
@@ -149,8 +149,22 @@ def main():
     # add games to the database
     #add_games(cur)
     
-    query = "SELECT * FROM OppPlayerStats WHERE Name = 'Team';"
-    print(run_query(cur, query))    
+    #query = "DELETE FROM UKPlayerStats WHERE Name = 'Team' OR Name = 'TEam' OR Name = 'team' OR Name = '';"
+    #print(run_query(cur, query))
+
+    query = '''SELECT Name, Date, PTS
+        FROM (
+            SELECT Name, Date, PTS
+            FROM UKPlayerStats
+            WHERE Opponent = 'Tennessee'
+            UNION
+            SELECT Name, Date, PTS
+            FROM OppPlayerStats
+            WHERE Team = 'Tennessee'        
+        )
+        WHERE PTS > 19 ORDER BY PTS;
+        '''
+    print(run_query(cur, query))
     
     # commit and close the database
     conn.commit()
