@@ -149,7 +149,7 @@ def main():
     # add games to the database
     #add_games(cur)
     
-    query = "DELETE * FROM OppPlayerStats WHERE Name = 'Team';"
+    query = "SELECT * FROM OppPlayerStats WHERE Name = 'Team';"
     print(run_query(cur, query))    
     
     # commit and close the database
