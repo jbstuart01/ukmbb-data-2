@@ -62,23 +62,22 @@ def get_box_score(soup, title):
             # insert the opponent
             player.insert(2, info[1])
             # insert the team identifier
-            player.insert(3, 0 if team is team1_data else 1)
-
-    print(box_score)
+            player.insert(3, 1 if team is team1_data else 0)
 
     # declare a list of invalid names to delete
     invalid_names = ['', "Team", "TEam", "team"]
 
     # delete out bad data, including miscellaneous Team totals
     team1_data = [player for player in team1_data if player[0] not in invalid_names]
-    team2_data = [player for player in team1_data if player[0] not in invalid_names]
+    team2_data = [player for player in team2_data if player[0] not in invalid_names]
 
     # remove any ' (*)' links from opponents
     # this indicates that the player is "significant" but we don't care about that
     team2_data = [[player[0].replace(' (*)', '')] + player[1:] for player in team2_data]
 
     # return the box score as a dictionary
-    return {"PlayerStats" : [team1_data + team2_data], "TeamStats" : [box_score[0][-1] + box_score[1][-1]]}
+    # trim the Totals value off the player stats
+    return {"PlayerStats" : team1_data[:-1] + team2_data[:-1], "TeamStats" : [box_score[0][-1], box_score[1][-1]]}
 
 # given the webpage's title, figure out if Kentucky is listed first
 def uk_first(title):

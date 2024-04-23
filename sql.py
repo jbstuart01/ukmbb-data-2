@@ -152,18 +152,7 @@ def main():
     #query = "DELETE FROM UKPlayerStats WHERE Name = 'Team' OR Name = 'TEam' OR Name = 'team' OR Name = '';"
     #print(run_query(cur, query))
 
-    query = '''SELECT Name, PTS
-        FROM (
-            SELECT Name, Date, PTS
-            FROM UKPlayerStats
-            WHERE Opponent = 'Tennessee'
-            UNION
-            SELECT Name, Date, PTS
-            FROM OppPlayerStats
-            WHERE Team = 'Tennessee'        
-        )
-        WHERE PTS > 19 AND Date < '2016' ORDER BY DATE;
-        '''
+    query = "SELECT Date, PTS FROM OppTeamStats WHERE Team = 'Pennsylvania';"
     print(run_query(cur, query))
     
     # commit and close the database
