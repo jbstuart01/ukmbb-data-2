@@ -16,7 +16,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS GameInfo (
             OppScore INT,
             Notes TEXT,
             Arena TEXT,
-            Attendnance INT,
+            Attendance INT,
             City TEXT,
             UKHalfScore INT,
             OppHalfScore INT,
@@ -47,7 +47,7 @@ def main():
         for row in reader:
             cursor.execute('''
                 INSERT INTO GameInfo (
-                    Date, Season, Opponent, Result, Location, UKScore, OppScore, Notes, Arena, Attendnance, City, UKHalfScore, OppHalfScore, OTS, UKRank, OppRank, OppCoach, OppConference, LeadScorer, LeadScorerPoints, LeadRebounder, LeadRebounderRebs, LeadAssister, LeadAssisterAsts, LeadStealer, LeadStealerSteals, LeadBlocker, LeadBlockerBlocks)
+                    Date, Season, Opponent, Result, Location, UKScore, OppScore, Notes, Arena, Attendance, City, UKHalfScore, OppHalfScore, OTS, UKRank, OppRank, OppCoach, OppConference, LeadScorer, LeadScorerPoints, LeadRebounder, LeadRebounderRebs, LeadAssister, LeadAssisterAsts, LeadStealer, LeadStealerSteals, LeadBlocker, LeadBlockerBlocks)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     ''', row)
             
