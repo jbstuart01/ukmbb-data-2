@@ -2,9 +2,9 @@ import scraper
 import sqlite3
 
 # populate a database with a box score
-def populate_database(cur, box_score):
+def populate_database(cursor, box_score):
     # create a table to store Kentucky players' statistics
-    cur.execute('''CREATE TABLE IF NOT EXISTS UKPlayerStats (
+    cursor.execute('''CREATE TABLE IF NOT EXISTS UKPlayerStats (
                 Name TEXT,
                 Date TEXT,
                 Opponent TEXT,
@@ -27,7 +27,7 @@ def populate_database(cur, box_score):
                 )''')
     
     # create a table to store opposing players' statistics
-    cur.execute('''CREATE TABLE IF NOT EXISTS OppPlayerStats (
+    cursor.execute('''CREATE TABLE IF NOT EXISTS OppPlayerStats (
                 Name TEXT,
                 Date TEXT,
                 Team TEXT,
@@ -50,7 +50,7 @@ def populate_database(cur, box_score):
                 )''')
     
     # create a table to store UK's team statistics
-    cur.execute('''CREATE TABLE IF NOT EXISTS UKTeamStats (
+    cursor.execute('''CREATE TABLE IF NOT EXISTS UKTeamStats (
                 Name TEXT,
                 Date TEXT,
                 Opponent TEXT,
@@ -73,7 +73,7 @@ def populate_database(cur, box_score):
                 )''')
     
     # create a table to store UK's team statistics
-    cur.execute('''CREATE TABLE IF NOT EXISTS OppTeamStats (
+    cursor.execute('''CREATE TABLE IF NOT EXISTS OppTeamStats (
                 Name TEXT,
                 Date TEXT,
                 Team TEXT,
@@ -98,53 +98,30 @@ def populate_database(cur, box_score):
     # iterate through each player, updating the correct table
     # iterate through Kentucky players
     for player in box_score["UKPlayerStats"]:
-        cur.execute("INSERT INTO UKPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
+        cursor.execute("INSERT INTO UKPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
     # iterate through opposing players
     for player in box_score["OppPlayerStats"]:
-        cur.execute("INSERT INTO OppPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
+        cursor.execute("INSERT INTO OppPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
     
     # add Kentucky's team stats
-    cur.execute("INSERT INTO UKTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["UKTeamStats"])
+    cursor.execute("INSERT INTO UKTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["UKTeamStats"])
     # add the opponent's team stats
-    cur.execute("INSERT INTO OppTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["OppTeamStats"])
+    cursor.execute("INSERT INTO OppTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["OppTeamStats"])
 
 # perform queries to the database
-def run_query(cur, query):
+def run_query(cursor, query):
     #print(query)
     # execute the query
-    cur.execute(query)
+    cursor.execute(query)
 
     # return all the results
-    return cur.fetchall()
-
-# add multiple games to the database
-def add_games(cur):
-    # the game we start with
-    game = '20091113Morehead.html'
-    # iterate over however many consecutive games you want to add
-    for i in range(0, 532):
-        # build a soup out of this game's webpage
-        soup = scraper.read_html(f"http://www.bigbluehistory.net/bb/Statistics/Games/{game}")
-        
-        # get the title of this game
-        title = scraper.get_title(soup)
-        
-        # make the box score
-        box_score = scraper.get_box_score(soup, title)
-
-        # populate the database with this box score
-        populate_database(cur, box_score)
-
-        print(f"Added: {game}")
-        
-        # get the next game
-        game = scraper.next_game(soup)
+    return cursor.fetchall()
 
 # main function
 def main():
     # connect to the database
-    conn = sqlite3.connect('ukgames.db')
-    cur = conn.cursor()
+    connection = sqlite3.connect('ukgames.db')
+    cur = connection.cursor()
 
     # add games to the database
     #add_games(cur)
@@ -156,8 +133,8 @@ def main():
     print(run_query(cur, query))
     
     # commit and close the database
-    conn.commit()
-    conn.close()
+    connection.commit()
+    connection.close()
 
 if __name__ == "__main__":
     main()
