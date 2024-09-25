@@ -1,4 +1,4 @@
-import scraper
+import sample.box_score_scraper as box_score_scraper
 import sql
 
 # create a cursor connected to the database
@@ -14,13 +14,13 @@ game = '20240321Oakland.html'
 # iterate until the last game, exclusive
 while game == '20240321Oakland.html':
     # build a soup out of this game's webpage
-    soup = scraper.read_html(f"http://www.bigbluehistory.net/bb/Statistics/Games/{game}")
+    soup = box_score_scraper.read_html(f"http://www.bigbluehistory.net/bb/Statistics/Games/{game}")
     
     # get the title of this game
-    title = scraper.get_title(soup)
+    title = box_score_scraper.get_title(soup)
     
     # make the box score
-    box_score = scraper.get_box_score(soup, title)
+    box_score = box_score_scraper.get_box_score(soup, title)
 
     # populate the database with this box score
     sql.populate_database(cursor, box_score)

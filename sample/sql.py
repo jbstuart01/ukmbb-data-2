@@ -1,4 +1,4 @@
-import scraper
+import sample.box_score_scraper as box_score_scraper
 import sqlite3
 
 # populate a database with a box score
