@@ -67,7 +67,7 @@ def populate_database(cursor, box_score):
         elif len(player) == 15:
             cursor.execute('''INSERT INTO PlayerStats (
                 Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
-                VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)
+                VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?)''', player)
         
         # early 70s with minutes
         elif len(player) == 12:
@@ -75,11 +75,17 @@ def populate_database(cursor, box_score):
                 Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
                 VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)    
 
-        # early 70s no minutes
         elif len(player) == 11:
-            cursor.execute('''INSERT INTO PlayerStats (
-                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
-                VALUES (?, ?, ?, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)    
+            # early 70s no minutes
+            if player[0] > '1970':
+                cursor.execute('''INSERT INTO PlayerStats (
+                    Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                    VALUES (?, ?, ?, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)
+            # pre-70s minutes but no assists
+            else:
+                cursor.execute('''INSERT INTO PlayerStats (
+                    Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                    VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, NULL, NULL, ?)''', player)
 
         # early 70s no assists
         elif len(player) == 10:
@@ -87,6 +93,30 @@ def populate_database(cursor, box_score):
                 Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
                 VALUES (?, ?, ?, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, NULL, NULL, ?)''', player)    
 
+        # 1930s-1950s, some 1920s
+        elif len(player) == 8:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, NULL, ?, NULL, NULL, NULL, ?, ?, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, ?)''', player)    
+    
+        # 1920s 
+        elif len(player) == 4:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?)''', player)    
+        # 1910s
+        elif len(player) == 6:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, NULL, ?, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?)''', player)    
+
+        # 1900s
+        elif len(player) == 3:
+             cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)''', player)    
+
+             
             
     
     

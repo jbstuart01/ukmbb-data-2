@@ -9,10 +9,10 @@ cursor = sql.sqlite3.connect('ukgames.db').cursor()
 #cursor.execute('''DROP TABLE IF EXISTS TeamStats''')
 
 # the game we start with
-game = '19640314LoyolaChicago.html'
+game = '20240321Oakland.html'
 
 # iterate until the last game, exclusive
-while game != '19701201Northwestern.html':
+while game == '20240321Oakland.html':
     # build a soup out of this game's webpage
     soup = scraper.read_html(f"http://www.bigbluehistory.net/bb/Statistics/Games/{game}")
     
@@ -28,7 +28,12 @@ while game != '19701201Northwestern.html':
     print(f"Added: {game}")
     
     # get the next game
-    game = scraper.next_game(soup)
+    try:
+        #game = scraper.next_game(soup)
+        game = ""
+    except IndexError:
+        print("AAHHH INDEX ERROR!")
+        break
     
 # Commit the changes
 cursor.connection.commit()
