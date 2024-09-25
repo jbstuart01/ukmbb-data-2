@@ -2,11 +2,13 @@ import csv
 from sql import *
 
 # create a cursor connected to the database
-# will create the database if it doesn't exist
 connection = sqlite3.connect('ukgames.db')
 cursor = connection.cursor()
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS GameInfo (
+# start from scratch
+cursor.execute('''DROP TABLE IF EXISTS GameInfo''')
+cursor.execute('''CREATE TABLE GameInfo (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             Date DATE,
             Season TEXT,
             Opponent TEXT,
@@ -44,6 +46,7 @@ def main():
         # skip the header
         next(reader)
         
+        # iterate through rows in the CSV
         for row in reader:
             cursor.execute('''
                 INSERT INTO GameInfo (

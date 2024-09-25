@@ -13,62 +13,72 @@ def read_html(url):
     # create and return a beautifulsoup object
     return BeautifulSoup(response.text, 'html.parser')
 
-# make the box score given soup
 def get_box_score(soup, title):
     tables = soup.find_all('table')
 
-    # get the title of the webpage
+    # Get the title and game information (date and opponent)
     title = get_title(soup)
-
-    # get the title and game information of this webpage, to be used later
     info = get_game_info(soup)
 
-    # initialize the box score
+    # Initialize the box score
     all_player_stats = []
 
-    # iterate through each table
+    # Iterate through each table
     for table in tables:
-        # find all rows
+        # Find all rows
         rows = table.find_all('tr')
 
-        # iterate through each row (player), skipping the header
+        # Iterate through each row (player), skipping the header
         for i in range(0, len(rows)):
-            # get data from each cell in the row
+            # Get data from each cell in the row
             cells = rows[i].find_all('td')
 
-            # extract text from each cell and remove whitespace
+            # Extract text from each cell and remove whitespace
             player_stats = [cell.get_text() for cell in cells]
 
-            # append player statistics to the list
+            # Append player statistics to the list
             all_player_stats.append(player_stats)
 
-    # strip leading null entry and trailing information
+    # Strip leading null entry and trailing information
     all_player_stats = all_player_stats[1:-2]
 
-    # use the null entry in between teams to separate the two teams in the list
+    # Use the null entry in between teams to separate the teams in the list
     separator_index = next((i for i, row in enumerate(all_player_stats) if not row), None)
 
-    # split the data into separate teams
+    # get the first team's information
     team1_data = all_player_stats[:separator_index]
+    # iterate through the players in team1
+    for player in team1_data:
+        # label this player as a Kentucky player if Kentucky is the first team
+        player.insert(0, "Kentucky" if uk_first(title) else info[1])
+    # get the second team's information 
     team2_data = all_player_stats[separator_index + 1:]
-    # compile the box score based on whether or not UK was shown first
-    box_score = [team1_data, team2_data] if uk_first(title) else [team2_data, team1_data]
+    # iterate through the players in team2
+    for player in team2_data:
+        # label this player as the opponent if Kentucky is the first team
+        player.insert(0, info[1] if uk_first(title) else "Kentucky")
 
-    # add the game's date and opponent to each player
-    # for Kentucky, this value means opponent, for Opponents, this means what team they played for
-    # iterate through both teams
-    for team in box_score:
-        # iterate through all players in this team
-        for player in team:
-            player.insert(1, info[0])
-            player.insert(2, info[1])
-    
-    # remove any ' (*)' links from opponents
-    # this indicates that the player is "significant" but we don't care about that
-    box_score[1] = [[player[0].replace(' (*)', '')] + player[1:] for player in box_score[1]]
+    # Combine player stats from both teams into one list
+    player_stats = team1_data[:-1] + team2_data[:-1]
 
-    # return the box score as a dictionary
-    return {"UKPlayerStats" : box_score[0][:-1] if box_score[0][-2][0] != "Team" else box_score[0][:-2], "OppPlayerStats" : box_score[1][:-1] if box_score[0][-2][0] != "Team" else box_score[0][:-2], "UKTeamStats" : box_score[0][-1], "OppTeamStats" : box_score[1][-1]}
+    # Add the game's date and opponent to each player
+    for player in player_stats:
+        # insert the date at the beginning of each player
+        player.insert(0, info[0])
+
+    # Remove any ' (*)' links from opponent players
+    player_stats = [[player[0].replace(' (*)', '')] + player[1:] for player in player_stats]
+
+    # Get team stats (the last row for each team)
+    team_stats = [team1_data[-1], team2_data[-1]]
+    for team in team_stats:
+        team.insert(0, info[0])
+        del(team[2])
+    # Return the combined player stats and team stats as a dictionary
+    return {
+        "PlayerStats": player_stats,
+        "TeamStats": team_stats
+    }
 
 # given the webpage's title, figure out if Kentucky is listed first
 def uk_first(title):
@@ -125,3 +135,7 @@ def next_game(soup):
     href_values = [link['href'] for link in links]
 
     return href_values[-1]
+
+# soup = read_html("http://www.bigbluehistory.net/bb/statistics/Games/20120111Auburn.html")
+# title = get_title(soup)
+# print(get_box_score(soup, title))

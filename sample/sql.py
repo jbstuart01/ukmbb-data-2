@@ -2,12 +2,13 @@ import scraper
 import sqlite3
 
 # populate a database with a box score
-def populate_database(cursor, box_score):
+def populate_database(cursor, box_score):    
     # create a table to store Kentucky players' statistics
-    cursor.execute('''CREATE TABLE IF NOT EXISTS UKPlayerStats (
-                Name TEXT,
+    cursor.execute('''CREATE TABLE IF NOT EXISTS PlayerStats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Date TEXT,
-                Opponent TEXT,
+                Team TEXT,
+                Name TEXT,
                 Minutes INT,
                 FGM INT,
                 FGA INT,
@@ -26,9 +27,9 @@ def populate_database(cursor, box_score):
                 PTS INT
                 )''')
     
-    # create a table to store opposing players' statistics
-    cursor.execute('''CREATE TABLE IF NOT EXISTS OppPlayerStats (
-                Name TEXT,
+    # create a table to store UK's team statistics
+    cursor.execute('''CREATE TABLE IF NOT EXISTS TeamStats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Date TEXT,
                 Team TEXT,
                 Minutes INT,
@@ -49,92 +50,67 @@ def populate_database(cursor, box_score):
                 PTS INT
                 )''')
     
-    # create a table to store UK's team statistics
-    cursor.execute('''CREATE TABLE IF NOT EXISTS UKTeamStats (
-                Name TEXT,
-                Date TEXT,
-                Opponent TEXT,
-                Minutes INT,
-                FGM INT,
-                FGA INT,
-                TFGM INT,
-                TFGA INT,
-                FTM INT,
-                FTA INT,
-                ORB INT,
-                DRB INT,
-                TRB INT,
-                PF INT,
-                AST INT,
-                STL INT,
-                BLK INT,
-                TOV INT,
-                PTS INT
-                )''')
+    # iterate through players, updating the table
+    for player in box_score["PlayerStats"]:
+        # if it's a game with every statistic
+        if len(player) == 19:
+            cursor.execute('''INSERT INTO PlayerStats (
+                    Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', player)
+        # if it's a game without distinct ORB/DRB totals
+        elif len(player) == 17:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?)''', player)
     
-    # create a table to store UK's team statistics
-    cursor.execute('''CREATE TABLE IF NOT EXISTS OppTeamStats (
-                Name TEXT,
-                Date TEXT,
-                Team TEXT,
-                Minutes INT,
-                FGM INT,
-                FGA INT,
-                TFGM INT,
-                TFGA INT,
-                FTM INT,
-                FTA INT,
-                ORB INT,
-                DRB INT,
-                TRB INT,
-                PF INT,
-                AST INT,
-                STL INT,
-                BLK INT,
-                TOV INT,
-                PTS INT
-                )''')
-    
-    # iterate through each player, updating the correct table
-    # iterate through Kentucky players
-    for player in box_score["UKPlayerStats"]:
-        cursor.execute("INSERT INTO UKPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
-    # iterate through opposing players
-    for player in box_score["OppPlayerStats"]:
-        cursor.execute("INSERT INTO OppPlayerStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", player)
-    
-    # add Kentucky's team stats
-    cursor.execute("INSERT INTO UKTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["UKTeamStats"])
-    # add the opponent's team stats
-    cursor.execute("INSERT INTO OppTeamStats VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", box_score["OppTeamStats"])
+        # if it's a game before the 3 point line
+        elif len(player) == 15:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)
+        
+        # early 70s with minutes
+        elif len(player) == 12:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)    
 
-# perform queries to the database
+        # early 70s no minutes
+        elif len(player) == 11:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, ?)''', player)    
+
+        # early 70s no assists
+        elif len(player) == 10:
+            cursor.execute('''INSERT INTO PlayerStats (
+                Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                VALUES (?, ?, ?, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, ?, ?, NULL, NULL, NULL, NULL, ?)''', player)    
+
+            
+    
+    
+    
+    
+    
+    
+    # add the team stats
+    for team in box_score["TeamStats"]:
+        if len(team) == 19:
+            cursor.execute('''INSERT INTO TeamStats (
+                    Date, Team, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', team)
+        elif len(team) == 17:
+            cursor.execute('''INSERT INTO TeamStats (
+                    Date, Team, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', team)
+            
+            
+
+# perform queries on the database
 def run_query(cursor, query):
-    #print(query)
     # execute the query
     cursor.execute(query)
 
     # return all the results
     return cursor.fetchall()
-
-# main function
-def main():
-    # connect to the database
-    connection = sqlite3.connect('ukgames.db')
-    cur = connection.cursor()
-
-    # add games to the database
-    #add_games(cur)
-    
-    #query = "DELETE FROM UKPlayerStats WHERE Name = 'Team' OR Name = 'TEam' OR Name = 'team' OR Name = '';"
-    #print(run_query(cur, query))
-
-    query = "SELECT Date, PTS FROM OppTeamStats WHERE Team = 'Pennsylvania';"
-    print(run_query(cur, query))
-    
-    # commit and close the database
-    connection.commit()
-    connection.close()
-
-if __name__ == "__main__":
-    main()
