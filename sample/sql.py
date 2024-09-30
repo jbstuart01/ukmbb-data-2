@@ -2,7 +2,7 @@ import sample.box_score_scraper as box_score_scraper
 import sqlite3
 
 # populate a database with a box score
-def populate_database(cursor, box_score):    
+def populate_boxscore(cursor, box_score):    
     # create a table to store Kentucky players' statistics
     cursor.execute('''CREATE TABLE IF NOT EXISTS PlayerStats (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -116,14 +116,6 @@ def populate_database(cursor, box_score):
                 Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
                 VALUES (?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)''', player)    
 
-             
-            
-    
-    
-    
-    
-    
-    
     # add the team stats
     for team in box_score["TeamStats"]:
         if len(team) == 19:
@@ -135,8 +127,6 @@ def populate_database(cursor, box_score):
                     Date, Team, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', team)
             
-            
-
 # perform queries on the database
 def run_query(cursor, query):
     # execute the query

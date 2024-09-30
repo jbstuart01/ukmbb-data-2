@@ -23,7 +23,7 @@ while game == '20240321Oakland.html':
     box_score = box_score_scraper.get_box_score(soup, title)
 
     # populate the database with this box score
-    sql.populate_database(cursor, box_score)
+    sql.populate_boxscore(cursor, box_score)
     
     print(f"Added: {game}")
     

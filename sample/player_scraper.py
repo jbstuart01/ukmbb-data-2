@@ -47,8 +47,16 @@ def get_city(soup):
     
     # Split by ',' and take the first part
     return hometown_tag.next_sibling.strip().split(',')[0]
- 
-# scrape data from a given player's webpage
+
+# get the home state
+def get_state(soup):
+    # Find the 'b' tag containing "Hometown: "
+    hometown_tag = soup.find('b', text="Hometown: ")
+    
+    # Find the <a> tag that contains the state
+    return hometown_tag.find_next('a').text.strip() if hometown_tag else None
+    
+ # scrape data from a given player's webpage
 def scrape_player(soup):    
     # create a list of all <p> sections of this webpage
     links = soup.find_all('p')
@@ -60,11 +68,11 @@ def scrape_player(soup):
     
     # check this player for a home city
     player_info['home_city'] = get_city(soup)
+    
+    # check this player for a home state
+    player_info['home_state'] = get_state(soup)
     print(links)
-    print(player_info)
-    
-    
-        
+    print(player_info)     
 
 def main():
     # URL of the webpage to scrape
@@ -74,7 +82,7 @@ def main():
     # Call the scrape_webpage function
     players = get_names(get_soup(names_url))
     
-    scrape_player(get_soup(player_url + players[0]))
+    scrape_player(get_soup(player_url + players[500]))
         
 
 if __name__ == "__main__":
