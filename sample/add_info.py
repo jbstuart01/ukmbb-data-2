@@ -2,7 +2,7 @@ import csv
 from sql import *
 
 # create a cursor connected to the database
-connection = sqlite3.connect('ukgames.db')
+connection = sqlite3.connect('ukgames2.db')
 cursor = connection.cursor()
 
 # start from scratch

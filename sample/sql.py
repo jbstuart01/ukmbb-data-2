@@ -1,4 +1,4 @@
-import sample.box_score_scraper as box_score_scraper
+import box_score_scraper as box_score_scraper
 import sqlite3
 
 # populate a database with a box score
@@ -9,29 +9,6 @@ def populate_boxscore(cursor, box_score):
                 Date TEXT,
                 Team TEXT,
                 Name TEXT,
-                Minutes INT,
-                FGM INT,
-                FGA INT,
-                TFGM INT,
-                TFGA INT,
-                FTM INT,
-                FTA INT,
-                ORB INT,
-                DRB INT,
-                TRB INT,
-                PF INT,
-                AST INT,
-                STL INT,
-                BLK INT,
-                TOV INT,
-                PTS INT
-                )''')
-    
-    # create a table to store UK's team statistics
-    cursor.execute('''CREATE TABLE IF NOT EXISTS TeamStats (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Date TEXT,
-                Team TEXT,
                 Minutes INT,
                 FGM INT,
                 FGA INT,
@@ -116,17 +93,26 @@ def populate_boxscore(cursor, box_score):
                 Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
                 VALUES (?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)''', player)    
 
-    # add the team stats
-    for team in box_score["TeamStats"]:
-        if len(team) == 19:
-            cursor.execute('''INSERT INTO TeamStats (
-                    Date, Team, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', team)
-        elif len(team) == 17:
-            cursor.execute('''INSERT INTO TeamStats (
-                    Date, Team, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', team)
-            
+# populate a database with a box score
+def populate_player(cursor, player):
+    # create a table to store UK's team statistics
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Players (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name TEXT,
+                Number INT,
+                HomeCity TEXT,
+                HomeState TEXT,
+                Height TEXT,
+                Weight INT,
+                BirthYear INT,
+                BirthMonth INT,
+                BirthDay INT                
+                )''')
+    # insert this player into the database
+    cursor.execute('''INSERT INTO Players (
+                   Name, Number, HomeCity, HomeState, Height, Weight, BirthYear, BirthMonth, BirthDay)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', player)
+
 # perform queries on the database
 def run_query(cursor, query):
     # execute the query
