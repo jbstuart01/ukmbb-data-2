@@ -10,6 +10,7 @@ cursor.execute('''DROP TABLE IF EXISTS GameInfo''')
 cursor.execute('''CREATE TABLE GameInfo (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             Date DATE,
+            Day TEXT,
             Season TEXT,
             Opponent TEXT,
             Result TEXT,
@@ -50,8 +51,8 @@ def main():
         for row in reader:
             cursor.execute('''
                 INSERT INTO GameInfo (
-                    Date, Season, Opponent, Result, Location, UKScore, OppScore, Notes, Arena, Attendance, City, UKHalfScore, OppHalfScore, OTS, UKRank, OppRank, OppCoach, OppConference, LeadScorer, LeadScorerPoints, LeadRebounder, LeadRebounderRebs, LeadAssister, LeadAssisterAsts, LeadStealer, LeadStealerSteals, LeadBlocker, LeadBlockerBlocks)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    Date, Day, Season, Opponent, Result, Location, UKScore, OppScore, Notes, Arena, Attendance, City, UKHalfScore, OppHalfScore, OTS, UKRank, OppRank, OppCoach, OppConference, LeadScorer, LeadScorerPoints, LeadRebounder, LeadRebounderRebs, LeadAssister, LeadAssisterAsts, LeadStealer, LeadStealerSteals, LeadBlocker, LeadBlockerBlocks)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     ''', row)
             
         # commit and close the connection

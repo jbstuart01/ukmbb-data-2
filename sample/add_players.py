@@ -20,7 +20,6 @@ def main():
 
         # insert this player into the database
         sql.populate_player(cursor, player_to_insert)
-        #print(f"Inserted: {player}")
         
     # commit the changes and close the connection to the database
     cursor.connection.commit()
