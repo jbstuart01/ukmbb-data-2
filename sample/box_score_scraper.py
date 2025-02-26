@@ -7,10 +7,9 @@ import sqlite3
 
 # read data from an HTML webpage
 def read_html(url):
-    # read data from the webpage
     response = requests.get(url)
 
-    # create and return a beautifulsoup object
+    # return a beautifulsoup object
     return BeautifulSoup(response.text, 'html.parser')
 
 def get_box_score(soup, title):

@@ -3,7 +3,7 @@ import sqlite3
 
 # populate a database with a box score
 def populate_boxscore(cursor, box_score):    
-    # create a table to store Kentucky players' statistics
+    # create a table to store players' statistics
     cursor.execute('''CREATE TABLE IF NOT EXISTS PlayerStats (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Date TEXT,
@@ -93,9 +93,9 @@ def populate_boxscore(cursor, box_score):
                 Date, Team, Name, Minutes, FGM, FGA, TFGM, TFGA, FTM, FTA, ORB, DRB, TRB, PF, AST, STL, BLK, TOV, PTS) 
                 VALUES (?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)''', player)    
 
-# populate a database with a box score
+# populate a database with player information
 def populate_player(cursor, player):
-    # create a table to store UK's team statistics
+    # create the table
     cursor.execute('''CREATE TABLE IF NOT EXISTS Players (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name TEXT,
@@ -108,7 +108,7 @@ def populate_player(cursor, player):
                 BirthMonth INT,
                 BirthDay INT                
                 )''')
-    # insert this player into the database
+    # insert a player into the database
     cursor.execute('''INSERT INTO Players (
                    Name, Number, HomeCity, HomeState, Height, Weight, BirthYear, BirthMonth, BirthDay)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', player)

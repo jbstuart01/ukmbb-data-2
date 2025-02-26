@@ -10,7 +10,6 @@ cursor = sql.sqlite3.connect('ukgames2.db').cursor()
 
 # the game we start with
 game = '19050222KentuckyUniversity.html'
-#old_games = ['19060112MiamiOH.html', ]
 # iterate until the last game, exclusive
 while game == '19050222KentuckyUniversity.html':
     # build a soup out of this game's webpage
@@ -24,8 +23,6 @@ while game == '19050222KentuckyUniversity.html':
 
     # populate the database with this box score
     sql.populate_boxscore(cursor, box_score)
-    
-    #print(f"Added: {game}")
     
     # get the next game
     try:
