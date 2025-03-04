@@ -1,8 +1,7 @@
 
-import csv
+from config import load_config, _parse_args
 import google.generativeai as genai
 import sql
-import time
 import yaml
 
 with open('data/api_key.yaml', 'r') as file:
@@ -67,6 +66,10 @@ def results_cleaner(question, query, answer):
                                     ''').text[:-1]  
 
 def main():
+    # get the config data from the command-line arguments
+    args = _parse_args(argv)
+    config = load_config(args.config)
+    
     # ask the user to enter their prompt
     prompt = str(input("Enter the information you'd like to find... "))
     # obtain the prompt's corresponding SQL query
