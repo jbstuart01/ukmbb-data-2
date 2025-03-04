@@ -50,7 +50,6 @@ def results_cleaner(question, query, answer):
         # instructions for the response model
         instruction = '''You will receive a prompt in the format:
             QUESTION: <question the user asked>
-            QUERY: <SQL query used to fetch results>
             RESPONSE: <results of running SQL query>
             
             Provide a response that combines QUESTION and ANSWER into a valid conversational statement. Include as much data from ANSWER as possible.
