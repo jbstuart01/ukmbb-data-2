@@ -5,6 +5,7 @@ def main(argv = sys.argv[1:]):
     # get the config data from the command-line arguments
     args = _parse_args(argv)
     config = load_config(args.config)
+    print(config.sql.db_schema)
     
 if __name__ == "__main__":
     main()

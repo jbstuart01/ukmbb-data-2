@@ -3,7 +3,18 @@ from pathlib import Path
 from pydantic import BaseModel
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
+from pydantic import BaseModel
 from typing import Sequence
+    
+class GeminiConfig(BaseModel):
+    api_key: str
+
+class SchemaConfig(BaseModel):
+    db_schema: str
+
+class Config(BaseModel):
+    gemini: GeminiConfig
+    sql: SchemaConfig
     
 def _parse_args(argv: Sequence[str]) -> Namespace:
     # create a parser object and expect one argument containing the path to config.toml and call it config
@@ -20,10 +31,4 @@ def load_config(file: Path) -> Config:
     # otherwise, load the data from the toml file and return it as a config object
     else:
         data = tomllib.loads(file.read_text())
-        return Config(**data)
-    
-class GeminiConfig(BaseModel):
-    api_key: str
-
-class Config(BaseModel):
-    gemini: GeminiConfig
+        return Config(**data) 

@@ -2,6 +2,7 @@
 from config import load_config, _parse_args
 import google.generativeai as genai
 import sql
+import sys
 import yaml
 
 with open('data/api_key.yaml', 'r') as file:
@@ -64,18 +65,18 @@ def results_cleaner(question, query, answer):
                                     ANSWER: {answer}
                                     ''').text[:-1]  
 
-def main():
+def main(argv = sys.argv[1:]):
     # get the config data from the command-line arguments
     args = _parse_args(argv)
     config = load_config(args.config)
     
-    # ask the user to enter their prompt
-    prompt = str(input("Enter the information you'd like to find... "))
+    # ask the user to enter their prompt and convert it to an SQL query
+    prompt = convert_language_to_sql(str(input("Enter the information you'd like to find... ")))
     # obtain the prompt's corresponding SQL query
     sql_query = convert_language_to_sql(prompt)
     
     # create a connection to the database
-    cursor = sql.sqlite3.connect('ukgames2.db').cursor()
+    cursor = sql.sqlite3.connect(config.sql.db_file).cursor()
     # query the database and get the response
     try:
         sql_response = sql.run_query(cursor, sql_query)    
