@@ -8,9 +8,11 @@ from typing import Sequence
     
 class GeminiConfig(BaseModel):
     api_key: str
+    query_instruction: str
 
 class SchemaConfig(BaseModel):
     db_schema: str
+    db_file: Path
 
 class Config(BaseModel):
     gemini: GeminiConfig
